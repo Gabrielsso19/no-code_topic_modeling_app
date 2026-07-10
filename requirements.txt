@@ -4,7 +4,7 @@ numpy
 bertopic
 umap-learn
 hdbscan>=0.8.29
-nltk
+scikit-learn
 gensim==4.3.2
 pyLDAvis>=3.4.1
-scikit-learn
+nltk
