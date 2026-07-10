@@ -11,8 +11,6 @@ import streamlit.components.v1 as components
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
-from gensim.models.coherencemodel import CoherenceModel
-from gensim.corpora.dictionary import Dictionary
 
 #BERTopic
 from bertopic import BERTopic
@@ -128,8 +126,7 @@ if uploaded_file is not None:
             
             with st.expander("📊 Rodar Teste de Coerência e Perplexidade", expanded=False):
                 st.markdown("""
-                A **Perplexidade** mede o quão bem o modelo prevê a amostra (quanto menor, melhor). 
-                A **Coerência** mede o grau de similaridade semântica entre as palavras de alta pontuação no tópico (quanto maior, melhor).
+                A **Perplexidade** mede o quão bem o modelo prevê a amostra (quanto menor, melhor).
                 """)
                 
                 min_k = st.number_input("Mínimo de Tópicos para teste", min_value=2, max_value=10, value=2)
@@ -138,16 +135,14 @@ if uploaded_file is not None:
                 if st.button("📈 Calcular Métricas de Avaliação"):
                     lista_k = list(range(int(min_k), int(max_k) + 1))
                     perplexidades = []
-                    coerencias = []
                     
                     # Vetorização temporária para o teste
-                    tf_vectorizer_test = CountVectorizer(stop_words=lista_stopwords)
+                    tf_vectorizer_test = CountVectorizer(stop_words=stopwords_finais)
                     tf_test = tf_vectorizer_test.fit_transform(docs_para_treino)
                     
                     # Preparar dados para o cálculo de coerência via Gensim
                     # (Precisamos quebrar os textos em tokens/palavras)
                     textos_tokenizados = [doc.split() for doc in docs_para_treino]
-                    dicionario_gensim = Dictionary(textos_tokenizados)
                     
                     barra_progresso = st.progress(0)
                     
@@ -167,21 +162,15 @@ if uploaded_file is not None:
                             top_palavras_idx = topic.argsort()[:-11:-1]
                             topicos_palavras.append([nomes_features[i] for i in top_palavras_idx])
                         
-                        # Calcular Coerência C_V usando os tópicos extraídos
-                        cm = CoherenceModel(topics=topicos_palavras, texts=textos_tokenizados, dictionary=dicionario_gensim, coherence='c_v')
-                        coerencias.append(cm.get_coherence())
-                        
                         barra_progresso.progress((idx + 1) / len(lista_k))
                     
                     # Exibir gráficos comparativos
                     df_metricas = pd.DataFrame({
                         'Número de Tópicos (K)': lista_k,
-                        'Perplexidade (Menor é Melhor)': perplexidades,
-                        'Coerência (Maior é Melhor)': coerencias
+                        'Perplexidade (Menor é Melhor)': perplexidades
                     }).set_index('Número de Tópicos (K)')
                     
                     st.line_chart(df_metricas['Perplexidade (Menor é Melhor)'])
-                    st.line_chart(df_metricas['Coerência (Maior é Melhor)'])
                     st.dataframe(df_metricas)
             
             # 3. CONFIGURAÇÃO FINAL E EXECUÇÃO
@@ -290,7 +279,7 @@ if uploaded_file is not None:
                     mime="text/html",
                     help="Baixe o gráfico interativo para abrir no seu navegador a qualquer momento, mesmo sem o Streamlit rodando."
                 )
-                
+
             elif model_choice == "BERTopic":
                 st.info("Processando BERTopic...")
                 # Passo 1: Configurar UMAP com a Seed para garantir reprodutibilidade
