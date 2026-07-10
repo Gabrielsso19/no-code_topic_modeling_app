@@ -1,6 +1,8 @@
 streamlit
 pandas
 numpy
+torch
+torchvision
 bertopic
 umap-learn
 hdbscan>=0.8.29
