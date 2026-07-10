@@ -3,8 +3,8 @@ pandas
 numpy
 bertopic
 umap-learn
-hdbscan
+hdbscan>=0.8.29
 nltk
 gensim
-pyLDAvis
+pyLDAvis>=3.4.1
 scikit-learn
