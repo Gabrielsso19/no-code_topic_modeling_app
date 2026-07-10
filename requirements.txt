@@ -8,3 +8,4 @@ scikit-learn
 gensim
 pyLDAvis>=3.4.1
 nltk
+openpyxl
